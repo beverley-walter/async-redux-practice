@@ -11,7 +11,7 @@ class LoadSubreddit extends React.Component {
   }
 
   handleChange(e) {
-    this.setState({subreddit: e.target.value})
+    this.setState({subreddit: e.target.value })
   }
 
   render() {
@@ -22,6 +22,7 @@ class LoadSubreddit extends React.Component {
           onClick={()=> this.props.dispatch(fetchPosts(this.state.subreddit))} >
           Give Me Those Sweet Memes
         </button>
+
       </div>
     )
   }

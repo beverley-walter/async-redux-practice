@@ -10679,7 +10679,7 @@ var _SubredditContainer2 = _interopRequireDefault(_SubredditContainer);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var App = function App() {
+var App = function App(props) {
   return _react2.default.createElement(
     'div',
     { className: 'app-container' },
@@ -10707,10 +10707,15 @@ var _subreddits = __webpack_require__(105);
 
 var _subreddits2 = _interopRequireDefault(_subreddits);
 
+var _errorMessage = __webpack_require__(239);
+
+var _errorMessage2 = _interopRequireDefault(_errorMessage);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 exports.default = (0, _redux.combineReducers)({
-  subreddits: _subreddits2.default
+  subreddits: _subreddits2.default,
+  errorMessage: _errorMessage2.default
 });
 
 /***/ }),
@@ -10762,7 +10767,7 @@ exports['default'] = thunk;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.receivePosts = undefined;
+exports.setErrorMessage = exports.receivePosts = undefined;
 exports.fetchPosts = fetchPosts;
 
 var _superagent = __webpack_require__(232);
@@ -10780,14 +10785,24 @@ var receivePosts = exports.receivePosts = function receivePosts(posts) {
   };
 };
 
+var setErrorMessage = exports.setErrorMessage = function setErrorMessage(message) {
+  return {
+    type: 'SET_ERROR_MESSAGE',
+    errorMessage: message
+  };
+};
+
 function fetchPosts(subreddit) {
   return function (dispatch) {
+    if (subreddit === '') return dispatch(setErrorMessage("Type yo thang"));
     _superagent2.default.get('/api/reddit/subreddit/' + subreddit).end(function (err, res) {
       if (err) {
-        console.error(err.message);
+        dispatch(setErrorMessage("ERROR:" + err.message));
+        console.error("ERROR:", err.message);
         return;
+      } else {
+        res.body.length == 0 ? dispatch(setErrorMessage("Ain't no thang")) : dispatch(receivePosts(res.body));
       }
-      dispatch(receivePosts(res.body));
     });
   };
 }
@@ -10890,25 +10905,25 @@ var Post = function Post(_ref) {
       author = _ref.author,
       permalink = _ref.permalink;
   return _react2.default.createElement(
-    'div',
+    "div",
     null,
     _react2.default.createElement(
-      'h1',
+      "h1",
       null,
       title
     ),
     _react2.default.createElement(
-      'h3',
+      "h3",
       null,
       author
     ),
     _react2.default.createElement(
-      'h3',
+      "h3",
       null,
       _react2.default.createElement(
-        'a',
-        { href: 'http://reddit.com/' + permalink },
-        'Click Here!'
+        "a",
+        { className: "cursor", href: "http://reddit.com/" + permalink },
+        "Click Here!"
       )
     )
   );
@@ -10937,6 +10952,8 @@ var _react = __webpack_require__(14);
 
 var _react2 = _interopRequireDefault(_react);
 
+var _reactRedux = __webpack_require__(33);
+
 var _Post = __webpack_require__(101);
 
 var _Post2 = _interopRequireDefault(_Post);
@@ -10944,10 +10961,16 @@ var _Post2 = _interopRequireDefault(_Post);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var Subreddit = function Subreddit(_ref) {
-  var subreddits = _ref.subreddits;
+  var subreddits = _ref.subreddits,
+      errorMessage = _ref.errorMessage;
   return _react2.default.createElement(
     'div',
     null,
+    _react2.default.createElement(
+      'h1',
+      { className: 'errorMessage' },
+      errorMessage
+    ),
     subreddits.map(function (props, i) {
       return _react2.default.createElement(
         'div',
@@ -10967,7 +10990,13 @@ Subreddit.propTypes = {
   subreddits: _react.PropTypes.array.isRequired
 };
 
-exports.default = Subreddit;
+function giveErrorToProps(state) {
+  return {
+    errorMessage: state.errorMessage
+  };
+}
+
+exports.default = (0, _reactRedux.connect)(giveErrorToProps)(Subreddit);
 
 /***/ }),
 /* 103 */
@@ -26171,6 +26200,31 @@ module.exports = function(module) {
 	return module;
 };
 
+
+/***/ }),
+/* 239 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+function errorMessage() {
+  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+  var action = arguments[1];
+
+  switch (action.type) {
+    case 'SET_ERROR_MESSAGE':
+      console.log("err sent to the reducer", action.errorMessage);
+      return action.errorMessage;
+    default:
+      return state;
+  }
+}
+
+exports.default = errorMessage;
 
 /***/ })
 /******/ ]);

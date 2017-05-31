@@ -7,16 +7,28 @@ export const receivePosts = (posts) => {
   }
 }
 
+export const setErrorMessage = (message) => {
+  return {
+    type: 'SET_ERROR_MESSAGE',
+    errorMessage: message
+  }
+}
+
 export function fetchPosts (subreddit) {
   return (dispatch) => {
+    if (subreddit === '') return dispatch(setErrorMessage("Type yo thang"))
     request
       .get(`/api/reddit/subreddit/${subreddit}`)
       .end((err, res) => {
         if (err) {
-          console.error(err.message)
+          dispatch(setErrorMessage("ERROR:" + err.message))
+          console.error("ERROR:", err.message)
           return
+        } else
+        {
+          (res.body.length == 0) ? dispatch(setErrorMessage("Ain't no thang")) :
+          dispatch(receivePosts(res.body))
         }
-        dispatch(receivePosts(res.body))
       })
   }
 }

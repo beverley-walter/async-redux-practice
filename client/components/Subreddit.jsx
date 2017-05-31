@@ -1,9 +1,10 @@
 import React, {PropTypes} from 'react'
-
+import {connect} from 'react-redux'
 import Post from './Post'
 
-const Subreddit = ({subreddits}) => (
+const Subreddit = ({subreddits, errorMessage}) => (
   <div>
+    <h1 className="errorMessage">{errorMessage}</h1>
     {subreddits.map((props, i) =>
       <div>
       <Post
@@ -21,4 +22,10 @@ Subreddit.propTypes = {
   subreddits: PropTypes.array.isRequired
 }
 
-export default Subreddit
+function giveErrorToProps(state) {
+  return {
+    errorMessage: state.errorMessage
+  }
+}
+
+export default connect(giveErrorToProps)(Subreddit)

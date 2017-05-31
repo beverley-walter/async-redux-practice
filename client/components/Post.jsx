@@ -4,7 +4,7 @@ const Post = ({title, author, permalink}) => (
   <div>
     <h1>{title}</h1>
     <h3>{author}</h3>
-    <h3><a href={`http://reddit.com/${permalink}`}>Click Here!</a></h3>
+    <h3><a className = "cursor" href={`http://reddit.com/${permalink}`}>Click Here!</a></h3>
   </div>
 )
 
